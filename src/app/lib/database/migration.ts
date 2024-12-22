@@ -19,6 +19,29 @@ export const player = () => {
     })
 }
 
+export const middleman = () => {
+    db.serialize(() => {
+        db.run (
+            `
+            CREATE TABLE IF NOT EXISTS middleman (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                playerID INT NOT NULL,
+                lobbyID INT NOT NULL,
+                PRIMARY KEY (playerID, lobbyID),
+                FOREIGN KEY playerID REFERENCES players(id),
+                FOREIGN KEY lobbyID REFERENCES lobbies(id),
+            );
+            `,
+            (err: Error) => {
+                if (err) {
+                    console.error(err.message);
+                }
+                console.log("Created middleman table successfully");
+            }
+        )
+    })
+}
+
 export const lobby = () => {
     db.serialize(() => {
         db.run (
@@ -26,8 +49,9 @@ export const lobby = () => {
             CREATE TABLE IF NOT EXISTS lobbies (
                 id INTEGER PRIMARY KEY AUTOINCREMEBT,
                 name TEXT NOT NULL UNIQUE,
-                player_One_ID INT NOT NULL,
-                FOREIGN KEY player_Two_ID INT REFERENCES players(id),
+                session BOOLEAN NOT NULL,
+                FOREIGN KEY player_One_ID REFERENCE players(id),
+                FOREIGN KEY player_Two_ID REFERENCE players(id),
                 FOREIGN KEY games INT REFERENCES games(id),
                 );
             `,
@@ -47,10 +71,18 @@ export const game = () => {
             `
             CREATE TABLE IF NOT EXISTS games (
                 id INTEGER PRIMARY KEY AUTOINCREMEBT,
-                Player_One_ID INT NOT NULL
-                Player_Two_ID INT NOT NULL,
-                FOREIGN KEY lobby_ID INT REFERENCES lobbies(id),
-                )`
+                FOREIGN KEY player_One_ID REFERENCE players(id),
+                FOREIGN KEY player_Two_ID REFERENCE players(id),
+                FOREIGN KEY lobby INT REFERENCES lobbies(id),
+                session BOOLEAN NOT NULL,
+            );
+            `,
+            (err: Error) => {
+                if (err) {
+                    console.error(err.message);
+                }
+                console.log("Created games table successfully");
+            }
         )
     })
 }

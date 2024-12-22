@@ -44,6 +44,21 @@ export const createPlayer = async (name: string) => {
     });
 }
 
+export const createLobby = async (playerOneId: number) => {
+    return await new Promise((resolve, reject) => {
+        db.run(
+            `INSERT INTO lobbies (player_One_ID, player_Two_ID) VALUES (?, ?)`,
+            [playerOneId, null],
+            function(err) {
+                if (err) {
+                    reject(err);
+                }
+                resolve(this);
+            }
+        );
+    });
+}
+
 export const joinLobby = async (lobby_name: string, player_Two_ID: string) => {
     return await new Promise((resolve, reject) => {
         db.get(
@@ -60,17 +75,4 @@ export const joinLobby = async (lobby_name: string, player_Two_ID: string) => {
     })
 }
 
-export const createLobby = async (playerOneId: number) => {
-    return await new Promise((resolve, reject) => {
-        db.run(
-            `INSERT INTO lobbies (player_One_ID, player_Two_ID) VALUES (?, ?)`,
-            [playerOneId, null],
-            function(err) {
-                if (err) {
-                    reject(err);
-                }
-                resolve(this);
-            }
-        );
-    });
-}
+// export const deleteLobby = 
