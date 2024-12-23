@@ -1,5 +1,5 @@
-import { getPlayer } from './database'
-import { createPlayer } from './database'
+import { getPlayer } from '../../lib/database/database';
+import { createPlayer } from '../../lib/database/database'
 
 export async function GET(req: Response, res: Response) {
     const query = `
@@ -34,12 +34,13 @@ export async function POST(req: Request, res: Response) {
 
     const query = `
         INSERT INTO players (name)
+        VALUES ( ? )
     `;
     const values = [name];
 
     let status, respBody;
     await createPlayer(name)
-    .then((player) => {
+    .then(() => {
         status = 200;
         respBody = { message : "Player successfully created"};
     })
