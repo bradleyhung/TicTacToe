@@ -1,6 +1,5 @@
 import path from "path";
 import sqlite3 from "sqlite3";
-import { player } from "./migration";
 
 const dbPath = path.join(process.cwd(), "player.db");
 export const db = new sqlite3.Database(
@@ -44,11 +43,43 @@ export const createPlayer = async (name: string) => {
     });
 }
 
-export const createLobby = async (playerOneId: number) => {
+export const createMiddleman = async (playerID: number, lobbyID: number) => {
+    return await new Promise((resolve, reject) => {
+        db.run (
+            `INSERT INTO middleman (playerID, lobbyID) VALUES (?, ?)`,
+            [playerID, lobbyID],
+            function(err) {
+                if (err) {
+                    reject(err);
+                }
+                resolve(this);
+            }
+        )
+    });
+}
+
+// Not using this function because of ON DELETE CASCADE from the migration file
+// export const deleteMiddleman = async (lobbyID: number) => {
+//     return await new Promise((resolve, reject) => {
+//         db.run(
+//             `
+//             DELETE FROM middleman WHERE lobbyID = ?`,
+//             [lobbyID],
+//             function(err) {
+//                 if (err) {
+//                     reject(err);
+//                 }
+//             resolve(this);
+//             }
+//         )
+//     });
+// }
+
+export const createLobby = async (lobby_name: string) => {
     return await new Promise((resolve, reject) => {
         db.run(
-            `INSERT INTO lobbies (player_One_ID, player_Two_ID) VALUES (?, ?)`,
-            [playerOneId, null],
+            `INSERT INTO lobbies (name) VALUES (?)`,
+            [lobby_name],
             function(err) {
                 if (err) {
                     reject(err);
@@ -59,20 +90,31 @@ export const createLobby = async (playerOneId: number) => {
     });
 }
 
-export const joinLobby = async (lobby_name: string, player_Two_ID: string) => {
+export const deleteLobby = async (lobby_name: string) => {
     return await new Promise((resolve, reject) => {
-        db.get(
-            `SELECT name from players, name from lobbies FROM players 
-            JOIN lobbies as lobbies ON players.id = player_Two_ID`,
-            [player_Two_ID],
-            (err, row) => {
-                if(err) {
+        db.run(
+            `DELETE FROM lobbies WHERE name = ?`,
+            [lobby_name],
+            function(err) {
+                if (err) {
                     reject(err);
                 }
-                resolve(row);
+                resolve(this);
             }
         )
     })
 }
 
-// export const deleteLobby = 
+export const createGame = async () => {
+    return await new Promise((resolve, reject) => {
+        db.run (
+            `INSERT INTO games DEFAULT VALUES`,
+            function(err) {
+                if (err) {
+                    reject(err);
+                }
+                resolve(this);
+            }
+        )
+    })
+}

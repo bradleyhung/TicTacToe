@@ -29,7 +29,7 @@ export const middleman = () => {
                 lobbyID INT NOT NULL,
                 PRIMARY KEY (playerID, lobbyID),
                 FOREIGN KEY playerID REFERENCES players(id),
-                FOREIGN KEY lobbyID REFERENCES lobbies(id),
+                FOREIGN KEY lobbyID REFERENCES lobbies(id) ON DELETE CASCADE,
             );
             `,
             (err: Error) => {
@@ -49,9 +49,6 @@ export const lobby = () => {
             CREATE TABLE IF NOT EXISTS lobbies (
                 id INTEGER PRIMARY KEY AUTOINCREMEBT,
                 name TEXT NOT NULL UNIQUE,
-                session BOOLEAN NOT NULL,
-                FOREIGN KEY player_One_ID REFERENCE players(id),
-                FOREIGN KEY player_Two_ID REFERENCE players(id),
                 FOREIGN KEY games INT REFERENCES games(id),
                 );
             `,
@@ -71,10 +68,8 @@ export const game = () => {
             `
             CREATE TABLE IF NOT EXISTS games (
                 id INTEGER PRIMARY KEY AUTOINCREMEBT,
-                FOREIGN KEY player_One_ID REFERENCE players(id),
-                FOREIGN KEY player_Two_ID REFERENCE players(id),
-                FOREIGN KEY lobby INT REFERENCES lobbies(id),
-                session BOOLEAN NOT NULL,
+                FOREIGN KEY winner INT REFERENCES players(id),
+                FOREIGN KEY lobby INT REFERENCES lobbies(id) ON DELETE CASCADE,
             );
             `,
             (err: Error) => {
@@ -86,3 +81,4 @@ export const game = () => {
         )
     })
 }
+
